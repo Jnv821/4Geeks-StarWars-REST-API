@@ -129,12 +129,12 @@ def get_users():
     return jsonify(response_body), 200
 
 #[GET] /users/favorites Get all the favorites that belong to the current user.
-# The route will be /users/<int:user_id>/favorites. This route should be protected by a Token or return 403 - Forbidden
 
-@app.route('/users/<int:user_id>/favorites', methods=['GET'])
-def get_favorites(user_id):
-
-    user = User.query.get(user_id)
+@app.route('/users/favorites', methods=['GET'])
+def get_favorites():
+    
+    data = request.json
+    user = User.query.get(data["id"])
     
     user_favorite_characters = user.favorite_characters
 
@@ -154,15 +154,13 @@ def get_favorites(user_id):
 
 #[POST] /favorite/planet/<int:planet_id> Add a new favorite planet to the current user with the planet id = planet_id.
 
-@app.route('/favorite/<int:user_id>/planet/<int:planet_id>', methods=['GET', 'POST'])
-def add_favorite_planet(user_id, planet_id):
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_favorite_planet(planet_id):
     
-    if request.method == 'GET':
-        response = {"response" : "GET"}
-        return jsonify(response)
-    elif request.method == 'POST':
     #get planet based on id on the url to serialize data and send it in the body of the response
-        user = User.query.get(user_id)
+        data = request.json
+
+        user = User.query.get(data["id"])
 
         planet = Planets.query.get(planet_id)
 
@@ -180,9 +178,11 @@ def add_favorite_planet(user_id, planet_id):
         return jsonify(response)
 
 #[POST] /favorite/people/<int:people_id> Add a new favorite people to the current user with the people id = people_id.
-@app.route('/favorite/<int:user_id>/people/<int:people_id>', methods=['GET', 'POST'])
-def add_favorite_character(user_id, people_id):
-    user = User.query.get(user_id)
+@app.route('/favorite/people/<int:people_id>', methods=['GET', 'POST'])
+def add_favorite_character(people_id):
+    
+    data = request.json
+    user = User.query.get(data['id'])
 
     character = Characters.query.get(people_id)
 
@@ -199,13 +199,11 @@ def add_favorite_character(user_id, people_id):
     
     return jsonify(response), 200
 #[DELETE] /favorite/planet/<int:planet_id> Delete favorite planet with the id = planet_id.
-@app.route('/favorite/<int:user_id>/planet/<int:planet_id>', methods=['GET', 'DELETE'])
-def delete_favorite_planet(user_id, planet_id):
-    if request.method == 'GET': 
-        response = {"request": 'GET'}
-        return jsonify(response)
-    elif request.method == 'DELETE':
-        user = User.query.get(user_id)
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
+def delete_favorite_planet(planet_id):
+
+        data = request.json
+        user = User.query.get(data['id'])
 
         planet = Planets.query.get(planet_id)
 
@@ -222,13 +220,12 @@ def delete_favorite_planet(user_id, planet_id):
         return jsonify(response), 200
 
 #[DELETE] /favorite/people/<int:people_id> Delete favorite people with the id = people_id.
-@app.route('/favorite/<int:user_id>/people/<int:people_id>', methods=['GET', 'DELETE'])
-def delete_favorite_character(user_id, people_id):
-    if request.method == 'GET': 
-        response = {"request": 'GET'}
-        return jsonify(response)
-    elif request.method == 'DELETE':
-        user = User.query.get(user_id)
+@app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
+def delete_favorite_character(people_id):
+
+        data = request.json
+
+        user = User.query.get(data['id'])
 
         character = Characters.query.get(people_id)
 
@@ -243,6 +240,7 @@ def delete_favorite_character(user_id, people_id):
         }    
 
         return jsonify(response), 200
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
